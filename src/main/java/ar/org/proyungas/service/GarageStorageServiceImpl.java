@@ -17,8 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ar.org.proyungas.exception.ErrorCode;
 import ar.org.proyungas.exception.ValidationException;
-import ar.org.proyungas.model.Layer;
-import ar.org.proyungas.repository.LayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -37,31 +35,26 @@ public class GarageStorageServiceImpl implements GarageStorageService{
     @Value("${storage.s3.bucket}")
     private String bucketName;
     
-    private final LayerRepository layerRepository;
-    
     @Value("${upload.max-size-mb:50}")
     private int maxSizeMb;
 
-    public GarageStorageServiceImpl(S3Client s3Client, LayerRepository layerRepository) {
+    public GarageStorageServiceImpl(S3Client s3Client) {
         this.s3Client = s3Client;
-        this.layerRepository = layerRepository;
     }
 
 
 	@Override
-    public void uploadFile(Long layerId, MultipartFile file, String format) {
+    public void uploadFile(MultipartFile file, String format, String status) {
         // 1. Check layer status
-        Layer layer = layerRepository.findById(layerId);
-//            .orElseThrow(() -> new ValidationException("Layer not found"));
-        if (List.of("APPROVED","PENDING","UNDER_REVIEW").contains(layer.getStatus())) {
-        	log.error("Uploads not allowed for status " + layer.getStatus());
-            throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+        if (List.of("APPROVED","PENDING","UNDER_REVIEW").contains(status)) {
+        	log.error("Uploads not allowed for status " + status);
+            throw new ValidationException(ErrorCode.INVALID_STATUS_ERROR);
         }
 
         // 2. Check file size
         if (file.getSize() > maxSizeMb * 1024 * 1024) {
         	log.error("File exceeds " + maxSizeMb + " MB limit");
-            throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+            throw new ValidationException(ErrorCode.FILE_SIZE_ERROR);
         }
 
         // 3. Format-specific validation
@@ -72,7 +65,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
             case "KML":
                 if (!file.getOriginalFilename().toLowerCase().endsWith(".kml")) {
                 	log.error("✗ File must have .kml extension");
-                    throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+                    throw new ValidationException(ErrorCode.INVALID_EXTENSION_ERROR);
                 }
                 break;
             case "KMZ":
@@ -84,12 +77,12 @@ public class GarageStorageServiceImpl implements GarageStorageService{
             case "GEOPACKAGE":
                 if (!file.getOriginalFilename().toLowerCase().endsWith(".gpkg")) {
                 	log.error("✗ File must have .gpkg extension");
-                    throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+                    throw new ValidationException(ErrorCode.INVALID_EXTENSION_ERROR);
                 }
                 break;
             default:
             	log.error("Unsupported format: " + format);
-                throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+                throw new ValidationException(ErrorCode.INVALID_EXTENSION_ERROR);
         }
 
         // 4. Upload to Garage
@@ -147,11 +140,11 @@ public class GarageStorageServiceImpl implements GarageStorageService{
 
             if (!missing.isEmpty()) {
             	log.error("✗ Missing required Shapefile parts: " + String.join(", ", missing));
-                throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+                throw new ValidationException(ErrorCode.MISSING_SHAPEFILE_ERROR);
             }
         } catch (IOException e) {
         	log.error("✗ Invalid ZIP structure");
-            throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+            throw new ValidationException(ErrorCode.INVALID_ZIP_ERROR);
         }
     }
 
@@ -165,16 +158,16 @@ public class GarageStorageServiceImpl implements GarageStorageService{
             // Example 5 checks:
             if (!entries.contains("doc.kml")) {
             	log.error("✗ Missing doc.kml");
-            	throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+            	throw new ValidationException(ErrorCode.INVALID_KMZ_ERROR);
             }
             	
             if (entries.stream().noneMatch(e -> e.endsWith(".png") || e.endsWith(".jpg"))) 
             	log.error("✗ No image resources found");
-                throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+                throw new ValidationException(ErrorCode.INVALID_KMZ_ERROR);
             // add 3 more checks as needed (valid folder structure, no empty kml, etc.)
         } catch (IOException e) {
         	log.error("✗ Invalid KMZ structure");
-            throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+            throw new ValidationException(ErrorCode.INVALID_KMZ_ERROR);
         }
     }
 
@@ -183,8 +176,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
             new ObjectMapper().readTree(file.getInputStream()); // basic JSON parse
         } catch (IOException e) {
         	log.error("✗ Invalid GeoJSON structure");
-            throw new ValidationException(ErrorCode.INVALID_ACTION_APPLICANT_ERROR);
+            throw new ValidationException(ErrorCode.INVALID_GEO_JSON_ERROR);
         }
     }
-
 }
