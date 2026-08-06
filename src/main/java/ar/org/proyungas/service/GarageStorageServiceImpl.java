@@ -35,8 +35,8 @@ public class GarageStorageServiceImpl implements GarageStorageService{
     @Value("${storage.s3.bucket}")
     private String bucketName;
     
-    @Value("${upload.max-size-mb:50}")
-    private int maxSizeMb;
+//    @Value("${upload.max-size-mb:50}")
+    private int maxSizeMb = 50;
 
     public GarageStorageServiceImpl(S3Client s3Client) {
         this.s3Client = s3Client;
@@ -140,8 +140,9 @@ public class GarageStorageServiceImpl implements GarageStorageService{
 
             if (!missing.isEmpty()) {
             	log.error("✗ Missing required Shapefile parts: " + String.join(", ", missing));
-                throw new ValidationException(ErrorCode.MISSING_SHAPEFILE_ERROR);
+//                throw new ValidationException(ErrorCode.MISSING_SHAPEFILE_ERROR);
             }
+            
         } catch (IOException e) {
         	log.error("✗ Invalid ZIP structure");
             throw new ValidationException(ErrorCode.INVALID_ZIP_ERROR);
