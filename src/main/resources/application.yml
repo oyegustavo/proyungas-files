@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: proyungas-files
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  profiles:
+    active: dev

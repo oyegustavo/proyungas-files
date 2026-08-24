@@ -1,0 +1,7 @@
+storage:
+  s3:
+    endpoint: http://127.0.0.1:3900
+    region: garage
+    access-key: GK6be71b0eabe40f16587323a4
+    secret-key: 76fe48cda3397124d4902155d097a9906e35ed5ee40936b83c446a8a922ab79b
+    bucket: mapas-app
