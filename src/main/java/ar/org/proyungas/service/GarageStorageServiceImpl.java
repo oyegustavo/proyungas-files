@@ -24,7 +24,10 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 @Slf4j
@@ -121,6 +124,20 @@ public class GarageStorageServiceImpl implements GarageStorageService{
                 .build();
         s3Client.deleteObject(deleteRequest);
 	}
+	
+	@Override
+	public List<String> listFiles() {
+	    ListObjectsV2Request request = ListObjectsV2Request.builder()
+	            .bucket(bucketName)
+	            .build();
+
+	    ListObjectsV2Response response = s3Client.listObjectsV2(request);
+
+	    return response.contents().stream()
+	            .map(S3Object::key)
+	            .collect(Collectors.toList());
+	}
+
 	
 	
 	  // --- Validations ---

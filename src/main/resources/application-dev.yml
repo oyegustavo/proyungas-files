@@ -1,7 +1,15 @@
+server:
+  port: 8095
 storage:
   s3:
     endpoint: http://127.0.0.1:3900
     region: garage
-    access-key: GK6be71b0eabe40f16587323a4
-    secret-key: 76fe48cda3397124d4902155d097a9906e35ed5ee40936b83c446a8a922ab79b
+    access-key: GKb50e2f62d26cbecf4ea9f5cd
+    secret-key: 6e337540c709838013d24dad247ce9659661bf48e45390ac8608f7da2f436a6a
     bucket: mapas-app
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    service-url:
+      defaultZone: http://servicio-eureka-server:8761/eureka

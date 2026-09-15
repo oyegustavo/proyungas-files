@@ -1,6 +1,7 @@
 package ar.org.proyungas.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -97,5 +98,16 @@ public class FilesController {
                                  .body(new ResponseMessage("Error deleting file: " + e.getMessage()));
         }
     }
-}
+    
+    @GetMapping("/list")
+    public ResponseEntity<List<String>> listFiles() {
+        try {
+            List<String> files = storageService.listFiles();
+            return ResponseEntity.ok(files);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Collections.emptyList());
+        }
+    }
 
+}
