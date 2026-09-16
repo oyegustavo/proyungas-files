@@ -22,7 +22,7 @@ import ar.org.proyungas.response.ResponseMessage;
 import ar.org.proyungas.service.GarageStorageService;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/file-manager")
 @CrossOrigin("http://localhost:8081")
 public class FilesController {
 
