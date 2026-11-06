@@ -2,7 +2,7 @@ server:
   port: ${PORT:0}
 storage:
   s3:
-    endpoint: http://127.0.0.1:3900
+    endpoint: http://garage:3900
     region: garage
     access-key: GKb50e2f62d26cbecf4ea9f5cd
     secret-key: 6e337540c709838013d24dad247ce9659661bf48e45390ac8608f7da2f436a6a
