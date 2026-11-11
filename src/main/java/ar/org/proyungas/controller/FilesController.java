@@ -20,10 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ar.org.proyungas.exception.ValidationException;
 import ar.org.proyungas.response.ResponseMessage;
 import ar.org.proyungas.service.GarageStorageService;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/file-manager")
 @CrossOrigin("http://localhost:8081")
+@Slf4j
 public class FilesController {
 
     private final GarageStorageService storageService;
@@ -39,6 +41,7 @@ public class FilesController {
             @RequestParam("format") String format,
             @RequestParam("status") String status,
             @RequestParam("layerId") Long layerId) {
+    	log.info("starting upload file... file size - []", file.getSize());
         try {
         	storageService.uploadFile(file, format, status);
             return ResponseEntity.ok(new ResponseMessage("✓ File ready: " + file.getOriginalFilename()));

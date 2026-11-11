@@ -72,7 +72,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
                 }
                 break;
             case "KMZ":
-                validateKmz(file);
+//                validateKmz(file);
                 break;
             case "GEOJSON":
                 validateGeoJson(file);
@@ -157,7 +157,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
 
             if (!missing.isEmpty()) {
             	log.error("✗ Missing required Shapefile parts: " + String.join(", ", missing));
-//                throw new ValidationException(ErrorCode.MISSING_SHAPEFILE_ERROR);
+                throw new ValidationException(ErrorCode.MISSING_SHAPEFILE_ERROR);
             }
             
         } catch (IOException e) {
