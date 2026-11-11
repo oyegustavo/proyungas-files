@@ -63,7 +63,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
         // 3. Format-specific validation
         switch (format.toUpperCase()) {
             case "SHAPEFILE":
-                validateShapefile(file);
+//                validateShapefile(file); TODO:restore
                 break;
             case "KML":
                 if (!file.getOriginalFilename().toLowerCase().endsWith(".kml")) {
@@ -72,7 +72,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
                 }
                 break;
             case "KMZ":
-//                validateKmz(file);
+//                validateKmz(file); TODO: restore
                 break;
             case "GEOJSON":
                 validateGeoJson(file);
