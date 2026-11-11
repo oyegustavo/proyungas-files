@@ -98,6 +98,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
 
             s3Client.putObject(putRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         } catch (IOException e) {
+        	log.error("ERROR - []", e);
             throw new RuntimeException("Error uploading file to Garage", e);
         }
     }
@@ -112,6 +113,7 @@ public class GarageStorageServiceImpl implements GarageStorageService{
         try (ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getRequest)) {
             return response.readAllBytes();
         } catch (IOException e) {
+        	log.error("ERROR - []", e);
             throw new RuntimeException("Error downloading file from Garage", e);
         }
 	}
