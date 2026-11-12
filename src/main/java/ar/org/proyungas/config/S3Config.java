@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -13,6 +15,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 
 @Configuration
+@Slf4j
 public class S3Config {
 
     @Value("${storage.s3.endpoint}")
@@ -39,5 +42,14 @@ public class S3Config {
                         .pathStyleAccessEnabled(true)
                         .build())
                 .build();
+    }
+    
+    @PostConstruct
+    public void logConfig() {
+        log.info("S3 Endpoint: {}", endpoint);
+        log.info("S3 Region: {}", region);
+        log.info("S3 Access Key: {}", accessKey);
+//        log.info("S3 Bucket: {}", bucketName);
+
     }
 }
